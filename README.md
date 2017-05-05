@@ -39,7 +39,7 @@ fod_currency:
     decimal_part:
         precision:  2                           # number of digits for the decimal part
         round_mode: up                          # round mode to use (up|down|even|odd)
-	adapter_class: Fod\CurrencyBundle\Adapter\EcbCurrencyAdapter  # Use your custom Currency Adapter
+    adapter_class: Fod\CurrencyBundle\Adapter\EcbCurrencyAdapter  # Use your custom Currency Adapter
     update_command: fod:currency:update         # name of console command for update currencies
     cache_expired: 14400                        # currency cached time
 ```
