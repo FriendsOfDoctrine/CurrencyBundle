@@ -57,7 +57,7 @@ class CurrencyAdapterFactory
         }
 
         foreach ($currencyAdapter->getManagedCurrencies() as $currencyCode) {
-            $currencyAdapter->add(new Currency($currencyCode, (float)$cache->getItem(Currency::CACHE_PREFIX_CURRENT . $currencyCode)->get(), (float)$cache->getItem(Currency::CACHE_PREFIX_YESTERDAY . $currencyCode)->get()));
+            $currencyAdapter->add(new Currency($currencyCode, (float)$cache->getItem(Currency::CACHE_PREFIX_CURRENT . $currencyCode)->get() ?: 1.0, (float)$cache->getItem(Currency::CACHE_PREFIX_YESTERDAY . $currencyCode)->get() ?: 1.0));
         }
 
         return $currencyAdapter->afterAttachAll();
