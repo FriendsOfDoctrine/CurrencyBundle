@@ -1,0 +1,27 @@
+{
+  "name": "FriendsOfDoctrine/CurrencyBundle",
+  "type": "symfony-bundle",
+  "description": "This Symfony3.2 bundle provide a service and a Twig extension to display currencies.",
+  "keywords": [
+    "Symfony3",
+    "bundle",
+    "currency"
+  ],
+  "homepage": "https://github.com/FriendsOfDoctrine/CurrencyBundle",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Mitrofanov Nikolay",
+      "email": "mitrofanovnk@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=7.0",
+    "symfony/framework-bundle": "~3.2"
+  },
+  "autoload": {
+    "psr-4": {
+      "Fod\\CurrencyBundle\\": ""
+    }
+  }
+}

@@ -1,0 +1,24 @@
+services:
+    fod_currency.adapter_factory:
+        class: Fod\CurrencyBundle\Adapter\CurrencyAdapterFactory
+        arguments: ['%fod_currency.currencies.default%', '%fod_currency.currencies.managed%']
+
+    fod_currency.adapter:
+        class: Fod\CurrencyBundle\Adapter\AbstractCurrencyAdapter
+        factory: 'fod_currency.adapter_factory:createCurrencyAdapter'
+        arguments: ['%fod_currency.adapter_class%', '@cache.app', '@service_container']
+
+    fod_currency.converter:
+        class: Fod\CurrencyBundle\Currency\Converter
+        arguments: ['@fod_currency.adapter', '%fod_currency.decimal_part.precision%', '%fod_currency.decimal_part.round_mode%']
+
+    fod_currency.formatter:
+        class: Fod\CurrencyBundle\Currency\Formatter
+        arguments: ['%locale%']
+
+    fod_currency.twig_extension:
+        class: Fod\CurrencyBundle\Twig\Extension\CurrencyExtension
+        public: false
+        arguments: ['@service_container']
+        tags:
+            - { name: twig.extension }
