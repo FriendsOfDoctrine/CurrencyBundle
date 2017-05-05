@@ -1,5 +1,5 @@
 {
-  "name": "FriendsOfDoctrine/CurrencyBundle",
+  "name": "friendsofdoctrine/CurrencyBundle",
   "type": "symfony-bundle",
   "description": "This Symfony3.2 bundle provide a service and a Twig extension to display currencies.",
   "keywords": [

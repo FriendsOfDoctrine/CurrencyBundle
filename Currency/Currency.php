@@ -88,7 +88,7 @@ class Currency implements CurrencyInterface, CurrencyDiffInterface
      */
     public function convert(float $rate)
     {
-        if ($rate !== 0) {
+        if ((int)$rate !== 0) {
             $this->rate /= $rate;
         }
     }
