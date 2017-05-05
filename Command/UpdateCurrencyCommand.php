@@ -2,8 +2,11 @@
 
 namespace Fod\CurrencyBundle\Command;
 
+use Fod\CurrencyBundle\Adapter\AbstractCurrencyAdapter;
 use Fod\CurrencyBundle\Currency\Currency;
+use Psr\Cache\CacheItemInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -33,43 +36,46 @@ class UpdateCurrencyCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        /** @var AbstractAdapter $cache */
         $cache = $this->getContainer()->get('cache.app');
 
+        /** @var CacheItemInterface $executedCache */
         $executedCache = $cache->getItem(self::CACHE_EXECUTE_FLAG);
 
         if (!$executedCache->isHit()) {
             $cache->save($executedCache->set(time()));
+            /** @var CacheItemInterface $currencyUpdateCache */
             $currencyUpdateCache = $cache->getItem(Currency::CACHE_KEY);
 
             if (!$currencyUpdateCache->isHit()) {
+                /** @var AbstractCurrencyAdapter $adapter */
                 $adapter = $this->getContainer()->get('fod_currency.adapter');
                 $adapter->attachAll();
-                /** @var Currency $currency */
-                foreach ($adapter as $currency) {
-                    $currencyCache = $cache->getItem(Currency::CACHE_PREFIX_CURRENT . $currency->getCode());
-                    if (!$currencyCache->isHit()) {
-                        $output->writeln(sprintf('<comment>Add: %s = %s</comment>', $currency->getCode(), $currency->getRate()));
-                    } else {
-                        $output->writeln(sprintf('<comment>Update: %s = %s</comment>', $currency->getCode(), $currency->getRate()));
-                    }
-                    $currencyCache->set($currency->getRate());
-                    $cache->save($currencyCache);
 
-                    $currencyCache = $cache->getItem(Currency::CACHE_PREFIX_YESTERDAY . $currency->getCode());
-                    if (!$currencyCache->isHit()) {
-                        $currencyCache->set($currency->getRate())->expiresAfter(86400);
-                        $cache->save($currencyCache);
-                    }
+                $this->updateCache($cache, $adapter, Currency::CACHE_PREFIX_CURRENT);
+                $cache->save($currencyUpdateCache->set(time())->expiresAfter($this->getContainer()->getParameter('fod_currency.cache_expired')));
+
+                if (!$cache->getItem(Currency::CACHE_YESTERDAY_KEY)->isHit()) {
+                    $this->updateCache($cache, $adapter, Currency::CACHE_PREFIX_YESTERDAY);
+                    $cache->save($cache->getItem(Currency::CACHE_YESTERDAY_KEY)->set(time())->expiresAfter(86400));
                 }
-
-                $currencyUpdateCache->set(time());
-                $currencyUpdateCache->expiresAfter($this->getContainer()->getParameter('fod_currency.cache_expired'));
-
-                $cache->save($currencyUpdateCache);
             }
             $cache->deleteItem($executedCache->getKey());
         } else {
             $output->writeln(sprintf('<info>Update process is running</info>'));
+        }
+    }
+
+    /**
+     * @param AbstractAdapter $cache
+     * @param AbstractCurrencyAdapter $adapter
+     * @param string $cachePrefix
+     */
+    protected function updateCache(AbstractAdapter $cache, AbstractCurrencyAdapter $adapter, string $cachePrefix)
+    {
+        /** @var Currency $currency */
+        foreach ($adapter as $currency) {
+            $cache->save($cache->getItem($cachePrefix . $currency->getCode())->set($currency->getRate()));
         }
     }
 }

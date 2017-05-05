@@ -13,6 +13,7 @@ class Currency implements CurrencyInterface, CurrencyDiffInterface
     const RUB = 'RUB';
 
     const CACHE_KEY = 'fod_currency_cache';
+    const CACHE_YESTERDAY_KEY = 'fod_currency_yesterday_cache';
     const CACHE_PREFIX_CURRENT = 'cache_fod_currency_today_';
     const CACHE_PREFIX_YESTERDAY = 'cache_fod_currency_yesterday_';
 
