@@ -133,7 +133,7 @@ class CurrencyExtension extends \Twig_Extension
      */
     public function getDiff(string $targetCurrency)
     {
-        $diffValue = $this->getConverter()->getConvertedDiffCurrency($targetCurrency);
+        $diffValue = round($this->getConverter()->getConvertedDiffCurrency($targetCurrency), 2);
 
         return ($diffValue >= 0 ? '+' : '-') . $this->format($diffValue, $targetCurrency, true, false);
     }

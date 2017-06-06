@@ -31,7 +31,9 @@ class Formatter implements FormatterInterface
     {
         $formatter = new \NumberFormatter($this->locale, $symbol ? \NumberFormatter::CURRENCY : \NumberFormatter::PATTERN_DECIMAL);
         $value = $formatter->formatCurrency($value, $valueCurrency);
-
+        if (strpos($value, ',') === 0) {
+            $value = '0' . $value;
+        }
         if (!$decimal) {
             $value = preg_replace('/[.,]00((?=\D)|$)/', '', $value);
         }
