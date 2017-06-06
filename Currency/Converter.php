@@ -166,4 +166,13 @@ class Converter implements ConverterInterface
     {
         return $this->adapter->getDefaultCurrency();
     }
+
+    /**
+     * @param string $currency
+     * @return Currency|null
+     */
+    public function getCurrency(string $currency)
+    {
+        return $this->adapter[$currency]??null;
+    }
 }

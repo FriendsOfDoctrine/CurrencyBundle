@@ -4,6 +4,7 @@ namespace Fod\CurrencyBundle\Twig\Extension;
 
 use Fod\CurrencyBundle\Currency\Converter;
 use Fod\CurrencyBundle\Currency\ConverterInterface;
+use Fod\CurrencyBundle\Currency\Currency;
 use Fod\CurrencyBundle\Currency\FormatterInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -42,6 +43,7 @@ class CurrencyExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
+            new \Twig_SimpleFunction('get_currency', [$this, 'getCurrency']),
             new \Twig_SimpleFunction('currency_get_rate', [$this, 'getRate']),
             new \Twig_SimpleFunction('currency_get_diff_rate', [$this, 'getDiff']),
         ];
@@ -124,6 +126,15 @@ class CurrencyExtension extends \Twig_Extension
     public function getRate(string $targetCurrency, $withSymbol = false)
     {
         return $this->format($this->getConverter()->convertCurrency($targetCurrency), $targetCurrency, true, $withSymbol);
+    }
+
+    /**
+     * @param string $targetCurrency
+     * @return Currency|null
+     */
+    public function getCurrency(string $targetCurrency)
+    {
+        return $this->getConverter()->getCurrency($targetCurrency);
     }
 
     /**

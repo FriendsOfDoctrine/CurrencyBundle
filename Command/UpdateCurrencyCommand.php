@@ -27,7 +27,8 @@ class UpdateCurrencyCommand extends ContainerAwareCommand
     {
         $this
             ->setName('fod:currency:update')
-            ->setDescription('Update currency rate');
+            ->setDescription('Update currency rate')
+            ->addOption('force', 'f', InputOption::VALUE_NONE, 'Update currency force');
     }
 
     /**
@@ -42,12 +43,12 @@ class UpdateCurrencyCommand extends ContainerAwareCommand
         /** @var CacheItemInterface $executedCache */
         $executedCache = $cache->getItem(self::CACHE_EXECUTE_FLAG);
 
-        if (!$executedCache->isHit()) {
+        if (!$executedCache->isHit() || $input->getOption('force')) {
             $cache->save($executedCache->set(time()));
             /** @var CacheItemInterface $currencyUpdateCache */
             $currencyUpdateCache = $cache->getItem(Currency::CACHE_KEY);
 
-            if (!$currencyUpdateCache->isHit()) {
+            if (!$currencyUpdateCache->isHit() || $input->getOption('force')) {
                 /** @var AbstractCurrencyAdapter $adapter */
                 $adapter = $this->getContainer()->get('fod_currency.adapter');
                 $adapter->attachAll();
@@ -55,7 +56,7 @@ class UpdateCurrencyCommand extends ContainerAwareCommand
                 $this->updateCache($cache, $adapter, Currency::CACHE_PREFIX_CURRENT);
                 $cache->save($currencyUpdateCache->set(time())->expiresAfter($this->getContainer()->getParameter('fod_currency.cache_expired')));
 
-                if (!$cache->getItem(Currency::CACHE_YESTERDAY_KEY)->isHit()) {
+                if (!$cache->getItem(Currency::CACHE_YESTERDAY_KEY)->isHit() || $input->getOption('force')) {
                     $this->updateCache($cache, $adapter, Currency::CACHE_PREFIX_YESTERDAY);
                     $cache->save($cache->getItem(Currency::CACHE_YESTERDAY_KEY)->set(time())->expiresAfter(86400));
                 }
